@@ -85,7 +85,8 @@ function viewData() {
           });
           break;
         case "View All Employees":
-          db.query("SELECT * FROM employee", (err, data) => {
+          //Added JOINing functionality. Now app shows manager name instead of ID
+          db.query("SELECT role.title, employee.first_name, employee.last_name, CONCAT(manager.first_name, ' ', manager.last_name) AS manager FROM employee JOIN employee manager ON manager.id=employee.manager_id JOIN role ON employee.role_id = role.id", (err, data) => {
             if (err) {
               throw err;
             } else {
@@ -293,7 +294,7 @@ function updateEmployee(roleId, first, last) {
   );
 }
 
-//This function is supposed to add the department, but I can't get it to work
+//This function adds the department. It wasn't working but the error has been resolved. There was a semi-colon after department in the message object
 function addDept() {
   inquirer
     .prompt({
@@ -302,9 +303,10 @@ function addDept() {
       name: "department_name",
     })
     .then((res) => {
+      console.log(res);
       db.query(
-        "INSERT INTO department(department_name) VALUES (?);",
-        res.departmentName,
+        "INSERT INTO department(department_name) VALUES (?)",
+        res.department_name,
         (err, data) => {
           if (err) {
             console.log(err);
